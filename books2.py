@@ -37,4 +37,11 @@ async def read_all_books():
 @app.post("/create-book")
 async def create_book(book_request: BookRequest):
   new_book = Book(**book_request.dict())
-  BOOKS.append(new_book)
+  BOOKS.append(find_book_id(new_book))
+
+def find_book_id(book: Book):
+  if len(BOOKS) > 0:
+    book.id = BOOKS[-1].id + 1
+  else:
+    book.id = 1
+  return book
