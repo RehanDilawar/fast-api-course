@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Body
-
+from pydantic import BaseModel
 app = FastAPI()
 
 class Book:
@@ -15,7 +15,12 @@ class Book:
     self.author = author
     self.description = description
     self.rating = rating
-
+class BookRequest(BaseModel):
+    id: int
+    title: str
+    author: str
+    description: str
+    rating: int
 BOOKS = [
   Book(1, "A Tale of Two Cities", "Charles Dickens", "A historical novel by Charles Dickens, first published in 1859. It tells the story of the French Revolution.", 5),
   Book(2, "Oliver Twist", "Charles Dickens", "A historical novel by Charles Dickens, first published in 1838. It tells the story of an orphan boy named Oliver Twist who endures a difficult childhood in the streets of London.", 4),
@@ -30,5 +35,6 @@ async def read_all_books():
     return BOOKS
 
 @app.post("/create-book")
-async def create_book(book_request= Body()):
-    BOOKS.append(book_request)
+async def create_book(book_request: BookRequest):
+  new_book = Book(**book_request.dict())
+  BOOKS.append(new_book)
