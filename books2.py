@@ -9,19 +9,22 @@ class Book:
   author: str
   description: str
   rating: int
+  published_date: int
 
-  def __init__(self, id: int, title: str, author: str, description: str, rating: int):
+  def __init__(self, id: int, title: str, author: str, description: str, rating: int, published_date: int):
     self.id = id
     self.title = title
     self.author = author
     self.description = description
     self.rating = rating
+    self.published_date = published_date
 class BookRequest(BaseModel):
     id: Optional[int] = Field(description="The ID is not needed on create", default=None)
     title: str = Field(min_length=3)
     author: str = Field(min_length=3)
     description: str = Field(min_length=3, max_length=100)
     rating: int = Field(ge=0, le=5)
+    published_date: int = Field(ge=1800, le=2026)
 
     model_config = {
       "json_schema_extra": {
@@ -29,17 +32,18 @@ class BookRequest(BaseModel):
           "title": "Title of the book",
           "author": "Author of the book",
           "description": "Description of the book",
-          "rating": 5
+          "rating": 5,
+          "published_date": 2022
         }
       }
     }
 BOOKS = [
-  Book(1, "A Tale of Two Cities", "Charles Dickens", "A historical novel by Charles Dickens, first published in 1859. It tells the story of the French Revolution.", 5),
-  Book(2, "Oliver Twist", "Charles Dickens", "A historical novel by Charles Dickens, first published in 1838. It tells the story of an orphan boy named Oliver Twist who endures a difficult childhood in the streets of London.", 4),
-  Book(3, "Great Expectations", "Charles Dickens", "A historical novel by Charles Dickens, first published in 1861. It tells the story of an orphan boy named Pip who rises from humble beginnings to become a gentleman.", 5),
-  Book(4, "Book 4", "Author 4", "Description 4", 2),
-  Book(5, "Book 5", "Author 5", "Description 5", 1),
-  Book(6, "Book 6", "Author 6", "Description 6", 3)
+  Book(1, "A Tale of Two Cities", "Charles Dickens", "A historical novel by Charles Dickens, first published in 1859. It tells the story of the French Revolution.", 5, 1859),
+  Book(2, "Oliver Twist", "Charles Dickens", "A historical novel by Charles Dickens, first published in 1838. It tells the story of an orphan boy named Oliver Twist who endures a difficult childhood in the streets of London.", 4, 1838),
+  Book(3, "Great Expectations", "Charles Dickens", "A historical novel by Charles Dickens, first published in 1861. It tells the story of an orphan boy named Pip who rises from humble beginnings to become a gentleman.", 5, 1861),
+  Book(4, "Book 4", "Author 4", "Description 4", 2, 2022),
+  Book(5, "Book 5", "Author 5", "Description 5", 1, 2022),
+  Book(6, "Book 6", "Author 6", "Description 6", 3, 2022)
 ]
 
 @app.get("/books")
@@ -58,6 +62,14 @@ async def read_book_by_rating(rating: int):
   books_to_return = []
   for book in BOOKS:
     if book.rating == rating:
+      books_to_return.append(book)
+  return books_to_return
+
+@app.get("/books/published/")
+async def read_book_by_published_date(published_date: int):
+  books_to_return = []
+  for book in BOOKS:
+    if book.published_date == published_date:
       books_to_return.append(book)
   return books_to_return
 
