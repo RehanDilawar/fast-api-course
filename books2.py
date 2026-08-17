@@ -17,11 +17,22 @@ class Book:
     self.description = description
     self.rating = rating
 class BookRequest(BaseModel):
-    id: Optional[int] = None
+    id: Optional[int] = Field(description="The ID is not needed on create", default=None)
     title: str = Field(min_length=3)
     author: str = Field(min_length=3)
     description: str = Field(min_length=3, max_length=100)
     rating: int = Field(ge=0, le=5)
+
+    model_config = {
+      "json_schema_extra": {
+        "example": {
+          "title": "Title of the book",
+          "author": "Author of the book",
+          "description": "Description of the book",
+          "rating": 5
+        }
+      }
+    }
 BOOKS = [
   Book(1, "A Tale of Two Cities", "Charles Dickens", "A historical novel by Charles Dickens, first published in 1859. It tells the story of the French Revolution.", 5),
   Book(2, "Oliver Twist", "Charles Dickens", "A historical novel by Charles Dickens, first published in 1838. It tells the story of an orphan boy named Oliver Twist who endures a difficult childhood in the streets of London.", 4),
